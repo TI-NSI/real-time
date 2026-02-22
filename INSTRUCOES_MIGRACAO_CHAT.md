@@ -144,7 +144,76 @@ Copie o componente `App/Livewire/Chat.php`. Certifique-se de ajustar o namespace
 
 ---
 
-## 4. Configuração do Frontend (JavaScript)
+## 4. Rotas e Controllers (Integração)
+
+Como seu projeto utiliza Blade e Controllers tradicionais, a melhor forma de integrar é criar uma rota e um controller que retornem uma view contendo o componente Livewire.
+
+### Controller
+Crie um controller para gerenciar o acesso à página de chat.
+**Arquivo:** `app/Http/Controllers/ChatController.php`
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ChatController extends Controller
+{
+    /**
+     * Exibe a página principal do chat.
+     */
+    public function index()
+    {
+        // Você pode passar dados adicionais para a view aqui se necessário,
+        // mas o componente Livewire já busca os usuários e mensagens por conta própria.
+        return view('chat.index');
+    }
+}
+```
+
+### Rotas
+Adicione a rota no seu arquivo de rotas web.
+**Arquivo:** `routes/web.php`
+
+```php
+use App\Http\Controllers\ChatController;
+
+Route::middleware(['auth'])->group(function () {
+    // Rota para acessar a página do chat
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+});
+```
+
+### A View "Pai" (Blade Padrão)
+Crie a view que o controller retorna. Ela servirá como um "container" para o componente Livewire.
+**Arquivo:** `resources/views/chat/index.blade.php`
+
+```html
+@extends('layouts.app') {{-- Estenda seu layout principal --}}
+
+@section('content')
+    <div class="container mx-auto py-6">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">{{ __('Chat em Tempo Real') }}</div>
+
+                    <div class="card-body">
+                        {{-- Aqui é onde a mágica acontece: chamamos o componente Livewire --}}
+                        <livewire:chat />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+```
+
+---
+
+## 5. Configuração do Frontend (JavaScript)
 
 No arquivo `resources/js/echo.js` (ou `bootstrap.js`), configure o Reverb. O comando `reverb:install` geralmente faz isso, mas verifique:
 
